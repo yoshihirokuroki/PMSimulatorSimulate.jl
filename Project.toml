@@ -1,4 +1,4 @@
-name = "PMSimulatorCallbacks"
+name = "PMSimulatorSimulate"
 uuid = "a1896e8a-d838-45f8-9b4a-9dfe2585f268"
 authors = ["Timothy Knab"]
 version = "1.0.0-DEV"
