@@ -1,5 +1,4 @@
-
-
+using DifferentialEquations
 function solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; evs::PMSimulatorBase.PMEvents, kwargs...)
     for instance in evs.instances
         evi = vcat(instance.input, instance.update)

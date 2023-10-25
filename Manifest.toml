@@ -2,7 +2,7 @@
 
 julia_version = "1.10.0-beta3"
 manifest_format = "2.0"
-project_hash = "5ac5b83ba6d5971e818c63a4a5c7c9b741dbfaa0"
+project_hash = "b3bd4e34050ec8be3df2ea72a622d09d1c519ae2"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "5d2e21d7b0d8c22f67483ef95ebdc39c0e6b6003"
@@ -975,23 +975,19 @@ version = "0.11.28"
 
 [[deps.PMParameterizedBase]]
 deps = ["ComponentArrays", "MacroTools", "ModelingToolkit", "SciMLBase", "Symbolics", "Unitful"]
-path = "/Users/knabt/.julia/dev/PMParameterizedBase"
+git-tree-sha1 = "0ea42172ebcb5a601881e3be4a009207dffe7744"
 uuid = "99b5832f-53bf-45ba-a9c8-837ddefabddf"
 version = "1.0.0"
 
 [[deps.PMParameterizedSolve]]
 deps = ["DifferentialEquations", "PMParameterizedBase"]
-git-tree-sha1 = "4322225b6798b4356b64c100eaedd70a28a5c4d4"
-repo-rev = "main"
-repo-url = "git@github.com:timknab/PMParameterizedSolve.jl.git"
+git-tree-sha1 = "8197280b3419acd87c3a9865dc9c5dfb2bffd376"
 uuid = "c61c237a-0ee8-4089-aed3-ebe590de2f80"
 version = "1.0.0"
 
 [[deps.PMSimulatorBase]]
 deps = ["DataFrames", "ModelingToolkit", "SciMLBase", "TidierData"]
 git-tree-sha1 = "d07083d8b6a7ac756bad18ed06c7e05805532056"
-repo-rev = "main"
-repo-url = "git@github.com:timknab/PMSimulatorBase.jl.git"
 uuid = "d32fc40f-6cc2-4d47-bc8e-739cf280b49f"
 version = "1.0.0-DEV"
 
