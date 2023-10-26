@@ -4,8 +4,9 @@ using DifferentialEquations
 hasduplicates(xs) = !allunique(xs)
 
 
+
 # OOP Solves
-function _solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing, evs::PMSimulatorBase.PMEvents = PMSimulatorBase.PMEvents(PMSimulatorBase.PMInstance[]); kwargs...)
+function _solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing}, evs::PMSimulatorBase.PMEvents; kwargs...)
     sol_out = Dict{Union{Symbol, Int64}, PMParameterized.PMSolution}
     IDs = [instance.id for instance in evs.instances]
     hasduplicates(IDs) ? error("Duplicated IDs detected in events") : nothing
@@ -24,16 +25,14 @@ function _solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing, evs::PM
 end
     
 
-function _solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing, evs::Vector{PMEvent} = PMSimulatorBase.PMEvent[]; kwargs...)
+function _solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing}, evs::Vector{PMEvent}; kwargs...)
     mdl_i = deepcopy(mdl)
     cbs = collect_evs(evs, mdl_i)
     sol = PMParameterizedSolve.solve(mdl_i, alg; callback = cbs, kwargs)
     return sol
 end
 
-solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; evs = nothing, kwargs...) = _solve(mdl, alg, evs; kwargs...)
-
-function solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; data::UnionPMSimulatorBase.DataFrames.AbstractDataFrame = DataFrame(), kwargs...)
+function _solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing}, data::PMSimulatorBase.DataFrames.AbstractDataFrame; kwargs...)
     sol_out = Dict{Union{Symbol, Int64}, PMParameterized.PMSolution}
     dfevs = PMSimulatorBase.df2evs(data)
     IDs = [instance.id for instance in dfevs.instances]
@@ -52,9 +51,28 @@ function solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; data::Un
         return sol_out
     end
 end
+
+function solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; kwargs...)
+    if :evs ∈ keys(kwargs) && :data ∈ keys(kwargs)
+        error("Cannot define both evs and data kwargs")
+    elseif :evs ∈ keys(kwargs)
+        kwin = Dict(key => kwargs[key] for key in keys(kwargs) if key != :evs)
+        out = _solve(mdl, alg, kwargs[:evs]; kwin...)
+    elseif :data ∈ keys(kwargs)
+        kwin = Dict(key => kwargs[key] for key in keys(kwargs) if key != :data)
+        out = _solve(mdl, alg, kwargs[:data]; kwin...)
+    else
+        out = PMParameterizedSolve.solve(mdl, alg; kwargs)
+    end
+    return out
+end
+
+
+
+
     
 # IIP Solves
-function _solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing, evs::PMSimulatorBase.PMEvents = PMSimulatorBase.PMEvents(PMSimulatorBase.PMInstance[]); kwargs...)
+function _solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing}, evs::PMSimulatorBase.PMEvents; kwargs...)
     mdls_out = Dict{Symbol, PMParameterizedBase.PMModel}
     IDs = [instance.id for instance in evs.instances]
     hasduplicates(IDs) ? error("Duplicated IDs detected in events") : nothing
@@ -73,20 +91,14 @@ function _solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing, evs::P
     end
 end
 
-function _solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing, evs::Vector{PMEvent} = PMSimulatorBase.PMEvent[]; kwargs...)
+function _solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing}, evs::Vector{PMEvent}; kwargs...)
     mdl_out = deepcopy(mdl)
     cbs = collect_evs(evs, mdl_out)
     PMParameterizedSolve.solve!(mdl_out, alg; callback = cbs, kwargs)
     return mdl_out
 end
 
-solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; evs = nothing, kwargs...) = _solve!(mdl, alg, evs; kwargs...)
-
-
-
-
-
-function solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; data::UnionPMSimulatorBase.DataFrames.AbstractDataFrame = DataFrame(), kwargs...)
+function _solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing}, data::PMSimulatorBase.DataFrames.AbstractDataFrame; kwargs...)
     mdls_out = Dict{Union{Symbol, Int64}, PMParameterized.PMModel}
     dfevs = PMSimulatorBase.df2evs(data)
     IDs = [instance.id for instance in dfevs.instances]
@@ -106,6 +118,21 @@ function solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; data::Un
 end
     
 
-
+function solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; kwargs...)
+    if :evs ∈ keys(kwargs) && :data ∈ keys(kwargs)
+        error("Cannot define both evs and data kwargs")
+    elseif :evs ∈ keys(kwargs)
+        kwin = Dict(key => kwargs[key] for key in keys(kwargs) if key != :evs)
+        out = _solve!(mdl, alg, kwargs[:evs]; kwin...)
+        return out
+    elseif :data ∈ keys(kwargs)
+        kwin = Dict(key => kwargs[key] for key in keys(kwargs) if key != :data)
+        out = _solve!(mdl, alg, kwargs[:data]; kwin...)
+        return out
+    else
+        PMParameterizedSolve.solve!(mdl, alg; kwargs)
+        return mdl
+    end
+end
 
 

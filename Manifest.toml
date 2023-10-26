@@ -2,7 +2,7 @@
 
 julia_version = "1.10.0-beta3"
 manifest_format = "2.0"
-project_hash = "f35bc4db2f475fbdc8a341ba1871b2940182e24d"
+project_hash = "e8088a9401cbc63b2269f6c9d698752b8ca1adf0"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "5d2e21d7b0d8c22f67483ef95ebdc39c0e6b6003"
@@ -661,6 +661,11 @@ deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse_jll"]
 git-tree-sha1 = "884c2968c2e8e7e6bf5956af88cb46aa745c854b"
 uuid = "ef3ab10e-7fda-4108-b977-705223b18434"
 version = "0.4.1"
+
+[[deps.KeywordDispatch]]
+git-tree-sha1 = "66757578d164a399c7195c30233a19934aabfc1b"
+uuid = "5888135b-5456-5c80-a1b6-c91ef8180460"
+version = "0.3.2"
 
 [[deps.Krylov]]
 deps = ["LinearAlgebra", "Printf", "SparseArrays"]
