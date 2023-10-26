@@ -1,10 +1,14 @@
 using DifferentialEquations
 
-#### NEED TO ADD CHECKS FOR DUPLICATE IDS!
+# Function to help check for duplicate IDs
+hasduplicates(xs) = !allunique(xs)
+
 
 # OOP Solves
 function solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; evs::PMSimulatorBase.PMEvents = PMSimulatorBase.PMEvents(PMSimulatorBase.PMInstance[]), kwargs...)
     sol_out = Dict{Union{Symbol, Int64}, PMParameterized.PMSolution}
+    IDs = [instance.id for instance in evs.instances]
+    hasduplicates(IDs) ? error("Duplicated IDs detected in events") : nothing
     for instance in evs.instances
         mdl_i = deepcopy(mdl) # Create copy to prevent modification of OG model
         evi = vcat(instance.input, instance.update)
@@ -30,6 +34,8 @@ end
 function solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; data::UnionPMSimulatorBase.DataFrames.AbstractDataFrame = DataFrame(), kwargs...)
     sol_out = Dict{Union{Symbol, Int64}, PMParameterized.PMSolution}
     dfevs = PMSimulatorBase.df2evs(data)
+    IDs = [instance.id for instance in dfevs.instances]
+    hasduplicates(IDs) ? error("Duplicated IDs detected in dataframe") : nothing
     for instance in dfevs.instances
         mdl_i = deepcopy(mdl) # Create copy to prevent modification of OG model
         evi = vcat(instance.input, instance.update)
@@ -48,6 +54,8 @@ end
 # IIP Solves
 function solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; evs::PMSimulatorBase.PMEvents = PMSimulatorBase.PMEvents(PMSimulatorBase.PMInstance[]) , kwargs...)
     mdls_out = Dict{Symbol, PMParameterizedBase.PMModel}
+    IDs = [instance.id for instance in evs.instances]
+    hasduplicates(IDs) ? error("Duplicated IDs detected in events") : nothing
     for instance in evs.instances
         mdl_i = deepcopy(mdl)
         evi = vcat(instance.input, instance.update)
@@ -55,6 +63,25 @@ function solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; evs::PM
         PMParameterizedSolve.solve!(mdl_i, alg; callback = cbs, kwargs)
         # push!(mdls_out, mdl_i)
         mdls_out[instance.ID, mdl_i]
+    end
+    if length(mdls_out) == 1
+        return Base.values(mdls_out)[1]
+    else
+        return mdls_out
+    end
+end
+
+function solve(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; data::UnionPMSimulatorBase.DataFrames.AbstractDataFrame = DataFrame(), kwargs...)
+    mdls_out = Dict{Union{Symbol, Int64}, PMParameterized.PMModel}
+    dfevs = PMSimulatorBase.df2evs(data)
+    IDs = [instance.id for instance in dfevs.instances]
+    hasduplicates(IDs) ? error("Duplicated IDs detected in dataframe") : nothing
+    for instance in dfevs.instances
+        mdl_i = deepcopy(mdl) # Create copy to prevent modification of OG model
+        evi = vcat(instance.input, instance.update)
+        cbs = collect_evs(evi, mdl_i)
+        PMParameterizedSolve.solve!(mdl_i, alg; callback = cbs, kwargs)
+        mdls_out[instance.ID] = mdl_i
     end
     if length(mdls_out) == 1
         return Base.values(mdls_out)[1]
@@ -63,22 +90,6 @@ function solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; evs::PM
     end
 end
     
-function solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; evs::Vector{PMEvent} = PMSimulatorBase.PMEvent[] , kwargs...)
-    mdls_out = Dict{Symbol, PMParameterizedBase.PMModel}
-    for instance in evs.instances
-        mdl_i = deepcopy(mdl)
-        evi = vcat(instance.input, instance.update)
-        cbs = collect_evs(evi, mdl_i)
-        PMParameterizedSolve.solve!(mdl_i, alg; callback = cbs, kwargs)
-        # push!(mdls_out, mdl_i)
-        mdls_out[instance.ID, mdl_i]
-    end
-    if length(mdls_out) == 1
-        return Base.values(mdls_out)[1]
-    else
-        return mdls_out
-    end
-end
 
 
 function solve!(mdl::PMModel, alg::Union{DEAlgorithm,Nothing} = nothing; evs::Vector{PMEvent} = PMSimulatorBase.PMEvent[], kwargs...)
