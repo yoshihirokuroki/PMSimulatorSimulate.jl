@@ -37,7 +37,10 @@ function updateParameterOrState!(mdl::PMModel, sym::Symbol, val::Float64)
 end
 
 function updateInput!(mdl::PMModel, sym::Symbol, val::Float64)
-    mdl._inputs[sym] = val
+    idx = mdl._inputs.sym_to_val[sym]
+    pair = getindex(getfield(mdl._inputs,:values),idx)
+    pairnew = Pair(pair.first, val)
+    setindex!(getfield(getfield(mdl,:_inputs),:values),pairnew, idx)
 end
 
 
