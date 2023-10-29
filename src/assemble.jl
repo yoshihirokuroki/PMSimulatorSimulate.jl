@@ -28,11 +28,16 @@ function updateParameterOrState!(mdl::PMModel, sym::Symbol, val::Float64)
         mdl.parameters[sym] = val
     elseif sym in mdl.states.names
         mdl.states[sym] = val
-    elseif sym in mdl._inputs.names
-        mdl._inputs[sym] = val
+    # elseif sym in mdl._inputs.names
+    #     # println(mdl._inputs[sym])
+    #     mdl._inputs[sym] = val
     else
         error("Cannot find $sym in parameters or states")
     end
+end
+
+function updateInput!(mdl::PMModel, sym::Symbol, val::Float64)
+    mdl._inputs[sym] = val
 end
 
 
@@ -40,7 +45,7 @@ function generateInputCB(mdl::PMModel, tstart::Float64, tinf::Union{Float64,Noth
     cbset = DiscreteCallback[]
     if tstart == 0.0
         if tinf > 0.0
-            updateParameterOrState!(mdl, inputP, amt)
+            updateInput!(mdl, input, amt)
             indexP = getMTKindex(mdl, inputP)
             cbend = PresetTimeCallback(tstart+tinf, (integrator) -> integrator.p[indexP] = integrator.p[indexP] - amt/tinf)
             push!(cbset, cbend)
@@ -98,7 +103,7 @@ function collect_evs(evs, mdl::PMModel)
         elseif isa(ev, PMUpdate) && !(ev._dataframe) && ev.quantity ∉ vcat(mdl.parameters.names, mdl.states.names, mdl._inputs.names)
             error("Error creating event for $(ev.quantity). $(ev.quantity) not found in model states, parameters or equations ")
         else
-            if isa(ev, PMInput) && ev.input ∈ vcat(mdl.parameters.names, mdl.states.names, mdl._inputs.names)
+            if isa(ev, PMInput) && ev.input ∈ vcat(mdl.parameters.names..., mdl.states.names..., mdl._inputs.names...)
                 t = ev.time
                 amt = ev.amt
                 tinf = ev.tinf
@@ -107,10 +112,11 @@ function collect_evs(evs, mdl::PMModel)
                 ii = ev.ii
 
                 # Check and make sure that input exists in the state/equation names
-                if input ∉ Base.keys(mdl._inputs._keyvalmap)
+                if input ∉ keys(mdl._inputs.sym_to_val)
                     error("Cannot find input $input in model states/equations")
                 else
-                    inputP = mdl._inputs._keyvalmap[input]
+                    idx = mdl._inputs.sym_to_val[input]
+                    inputP = PMParameterizedBase.getSymbolicName(mdl._inputs.values[idx].first)
                 end
 
                 if !iszero(addl)
@@ -121,15 +127,18 @@ function collect_evs(evs, mdl::PMModel)
                     tinf = isnothing(tinf) ? 0.0 : tinf
                 end
                 for (i, ti) in enumerate(t)
+                    # println(inputP)
+                    # println(input)
                     cbset_i = generateInputCB(mdl, ti, tinf[i], amt[i], inputP, input)
                     append!(cbset, cbset_i)
                 end
-            elseif isa(ev, PMUpdate) && ev.quantity ∈ vcat(mdl.parameters.names, mdl.states.names, mdl._inputs.names)
+            elseif isa(ev, PMUpdate) && ev.quantity ∈ vcat(mdl.parameters.names..., mdl.states.names..., mdl._inputs.names...)
                 cb_i = generateUpdateCB(mdl, ev)
                 if !isnothing(cb_i)
                     push!(cbset, cb_i)
                 end
             # else
+                # println(ev)
                 # error("Something went wrong")
             end
         end
