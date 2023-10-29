@@ -15,5 +15,6 @@ include("assemble.jl")
 include("solve.jl")
 
 export solve
+export collect_evs
 export solve!
 end

@@ -37,7 +37,7 @@ end
 function PMParameterizedSolve.solve(mdl::PMModel, evs::Vector{PMEvent}, alg::Union{DEAlgorithm,Nothing} = nothing; kwargs...)
     mdl_i = deepcopy(mdl)
     cbs = collect_evs(evs, mdl_i)
-    sol = PMParameterizedSolve.solve(mdl_i, alg; callback = cbs, kwargs...)
+    sol = solve(mdl_i, alg; callback = cbs, kwargs...)
     return sol
 end
 
