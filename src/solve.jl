@@ -4,19 +4,28 @@ using DifferentialEquations
 hasduplicates(xs) = !allunique(xs)
 
 
-
 # OOP Solves
 function PMParameterizedSolve.solve(mdl::PMModel, evs::PMSimulatorBase.PMEvents, alg::Union{DEAlgorithm,Nothing} = nothing; kwargs...)
     sol_out = Dict{Union{Symbol, Int64}, PMParameterizedSolve.PMSolution}()
     IDs = [instance.ID for instance in evs.instances]
     hasduplicates(IDs) ? error("Duplicated IDs detected in events") : nothing
+    # Save parameters and inputs prior to solution. This will let us restore them after. # This could (PROBABLY WILL) have implications/cause problems for parallel solution...
+    initP = mdl.parameters.values
+    initU = mdl.states.values
+    initIn = mdl.inputs.values
     for instance in evs.instances
-        mdl_i = deepcopy(mdl) # Create copy to prevent modification of OG model
         evi = vcat(instance.inputs, instance.updates)
         cbs = collect_evs(evi, mdl_i)
         sol_i = PMParameterizedSolve.solve(mdl_i, alg; callback = cbs, kwargs...)
         sol_out[instance.ID] = sol_i
     end
+
+    # Restore values.
+    mdl.parameters.values[:] = initP
+    mdl.states.values[:] = initU
+    mdl.states.parameters[:] = initP
+    mdl.inputs.values[:] = initIn
+
     if length(sol_out) == 1
         return Base.values(sol_out)[1]
     else

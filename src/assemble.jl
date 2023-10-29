@@ -6,8 +6,8 @@ InputOrUpdate = Union{PMInput, PMUpdate}
 indexof(sym::Symbol, syms) = findfirst(isequal(sym), syms)
 
 function getMTKindex(mdl::PMModel, sym::Symbol)
-    psyms = Symbol.(parameters(mdl._sys))
-    ssyms = [x.metadata[ModelingToolkit.VariableSource][2] for x in states(mdl._sys)]
+    psyms = Symbol.(parameters(mdl.model))
+    ssyms = [x.metadata[ModelingToolkit.VariableSource][2] for x in states(mdl.model)]
     pindex = indexof(sym, psyms)
     sindex = indexof(sym, ssyms)
     if !isnothing(pindex) && !isnothing(sindex)
@@ -27,7 +27,6 @@ function updateParameterOrState!(mdl::PMModel, sym::Symbol, val::Float64)
     if sym in mdl.parameters.names
         mdl.parameters[sym] = val
     elseif sym in mdl.states.names
-
         mdl.states[sym] = val
     elseif sym in mdl._inputs.names
         mdl._inputs[sym] = val
