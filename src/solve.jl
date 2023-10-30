@@ -12,7 +12,7 @@ function PMParameterizedSolve.solve(mdl::PMModel, evs::PMSimulatorBase.PMEvents,
     # Save parameters and inputs prior to solution. This will let us restore them after. # This could (PROBABLY WILL) have implications/cause problems for parallel solution...
     initP = mdl.parameters.values
     initU = mdl.states.values
-    initIn = mdl.inputs.values
+    initIn = mdl._inputs.values
     
     for instance in evs.instances
         evi = vcat(instance.inputs, instance.updates)
@@ -22,7 +22,7 @@ function PMParameterizedSolve.solve(mdl::PMModel, evs::PMSimulatorBase.PMEvents,
         mdl.parameters.values[:] = initP
         mdl.states.values[:] = initU
         mdl.states.parameters[:] = initP
-        mdl.inputs.values[:] = initIn
+        mdl._inputs.values[:] = initIn
         sol_out[instance.ID] = sol_i
     end
 
@@ -40,14 +40,14 @@ function PMParameterizedSolve.solve(mdl::PMModel, evs::Vector{PMEvent}, alg::Uni
     # Save parameters and inputs prior to solution. This will let us restore them after. # This could (PROBABLY WILL) have implications/cause problems for parallel solution...
     initP = mdl.parameters.values
     initU = mdl.states.values
-    initIn = mdl.inputs.values
+    initIn = mdl._inputs.values
     cbs = collect_evs(evs, mdl)
     sol = solve(mdl, alg; callback = cbs, kwargs...)
     # Restore values.
     mdl.parameters.values[:] = initP
     mdl.states.values[:] = initU
     mdl.states.parameters[:] = initP
-    mdl.inputs.values[:] = initIn
+    mdl._inputs.values[:] = initIn
     return sol
 end
 
@@ -59,7 +59,7 @@ function PMParameterizedSolve.solve(mdl::PMModel, data::PMSimulatorBase.DataFram
     # Save parameters and inputs prior to solution. This will let us restore them after. # This could (PROBABLY WILL) have implications/cause problems for parallel solution...
     initP = mdl.parameters.values
     initU = mdl.states.values
-    initIn = mdl.inputs.values
+    initIn = mdl._inputs.values
     for instance in dfevs.instances
         evi = vcat(instance.inputs, instance.updates)
         cbs = collect_evs(evi, mdl)
@@ -70,7 +70,7 @@ function PMParameterizedSolve.solve(mdl::PMModel, data::PMSimulatorBase.DataFram
         mdl.parameters.values[:] = initP
         mdl.states.values[:] = initU
         mdl.states.parameters[:] = initP
-        mdl.inputs.values[:] = initIn
+        mdl._inputs.values[:] = initIn
     end
     if length(sol_out) == 1
         return Base.values(sol_out)[1]
