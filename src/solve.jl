@@ -10,9 +10,9 @@ function PMParameterizedSolve.solve(mdl::PMModel, evs::PMSimulatorBase.PMEvents,
     IDs = [instance.ID for instance in evs.instances]
     hasduplicates(IDs) ? error("Duplicated IDs detected in events") : nothing
     # Save parameters and inputs prior to solution. This will let us restore them after. # This could (PROBABLY WILL) have implications/cause problems for parallel solution...
-    initP = mdl.parameters.values
-    initU = mdl.states.values
-    initIn = mdl._inputs.values
+    initP = deepcopy(mdl.parameters.values)
+    initU = deepcopy(mdl.states.values)
+    initIn = deepcopy(mdl._inputs.values)
     
     for instance in evs.instances
         evi = vcat(instance.inputs, instance.updates)
@@ -38,9 +38,9 @@ end
 
 function PMParameterizedSolve.solve(mdl::PMModel, evs::Vector{PMEvent}, alg::Union{DEAlgorithm,Nothing} = nothing; kwargs...)
     # Save parameters and inputs prior to solution. This will let us restore them after. # This could (PROBABLY WILL) have implications/cause problems for parallel solution...
-    initP = mdl.parameters.values
-    initU = mdl.states.values
-    initIn = mdl._inputs.values
+    initP = deepcopy(mdl.parameters.values)
+    initU = deepcopy(mdl.states.values)
+    initIn = deepcopy(mdl._inputs.values)
     cbs = collect_evs(evs, mdl)
     sol = solve(mdl, alg; callback = cbs, kwargs...)
     # Restore values.
@@ -57,9 +57,9 @@ function PMParameterizedSolve.solve(mdl::PMModel, data::PMSimulatorBase.DataFram
     IDs = [instance.ID for instance in dfevs.instances]
     hasduplicates(IDs) ? error("Duplicated IDs detected in dataframe") : nothing
     # Save parameters and inputs prior to solution. This will let us restore them after. # This could (PROBABLY WILL) have implications/cause problems for parallel solution...
-    initP = mdl.parameters.values
-    initU = mdl.states.values
-    initIn = mdl._inputs.values
+    initP = deepcopy(mdl.parameters.values)
+    initU = deepcopy(mdl.states.values)
+    initIn = deepcopy(mdl._inputs.values)
     for instance in dfevs.instances
         evi = vcat(instance.inputs, instance.updates)
         cbs = collect_evs(evi, mdl)
