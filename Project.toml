@@ -5,7 +5,6 @@ version = "0.2.3"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-DiffEqCallbacks = "459566f4-90b8-5000-8ac3-15dfb0a30def"
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 KeywordDispatch = "5888135b-5456-5c80-a1b6-c91ef8180460"
 PMParameterizedBase = "99b5832f-53bf-45ba-a9c8-837ddefabddf"
