@@ -10,6 +10,7 @@ PMModel = PMParameterizedBase.PMModel
 PMSolution = PMParameterizedSolve.PMSolution
 partialSol = PMParameterizedSolve.partialSol
 PMEvent = PMSimulatorBase.PMEvent
+collect_evs = PMSimulatorBase.collect_evs
 
 include("assemble.jl")
 include("solve.jl")
