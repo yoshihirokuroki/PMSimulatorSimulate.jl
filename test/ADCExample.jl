@@ -2,7 +2,7 @@ using Revise
 using PMParameterizedBase
 using PMSimulatorBase
 using PMSimulatorSimulate
-using PMParameterizedSenitivity
+using PMParameterizedSensitivity
 using Unitful
 using DifferentialEquations
 using Plots
