@@ -21,7 +21,7 @@ function PMParameterizedSolve.solve(mdl::PMModel, evs::PMSimulatorBase.PMEvents,
         # Restore values.
         mdl.parameters.values[:] = initP
         mdl.states.values[:] = initU
-        mdl.states.parameters[:] = initP
+        mdl.states.parameters.values[:] = initP
         mdl._inputs.values[:] = initIn
         sol_out[instance.ID] = sol_i
     end
@@ -46,7 +46,7 @@ function PMParameterizedSolve.solve(mdl::PMModel, evs::Vector{PMEvent}, alg::Uni
     # Restore values.
     mdl.parameters.values[:] = initP
     mdl.states.values[:] = initU
-    mdl.states.parameters[:] = initP
+    mdl.states.parameters.values[:] = initP
     mdl._inputs.values[:] = initIn
     return sol
 end
@@ -69,7 +69,7 @@ function PMParameterizedSolve.solve(mdl::PMModel, data::PMSimulatorBase.DataFram
         # Restore values.
         mdl.parameters.values[:] = initP
         mdl.states.values[:] = initU
-        mdl.states.parameters[:] = initP
+        mdl.states.parameters.values[:] = initP
         mdl._inputs.values[:] = initIn
     end
     if length(sol_out) == 1
