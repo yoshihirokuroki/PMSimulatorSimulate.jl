@@ -1,6 +1,5 @@
 module PMSimulatorSimulate
 using PMParameterizedBase
-using DiffEqCallbacks
 using PMParameterizedSolve
 using PMSimulatorBase
 using DifferentialEquations
