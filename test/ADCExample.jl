@@ -2,6 +2,7 @@ using Revise
 using PMParameterizedBase
 using PMSimulatorBase
 using PMSimulatorSimulate
+using PMParameterizedSenitivity
 using Unitful
 using DifferentialEquations
 using Plots
@@ -177,7 +178,7 @@ end
 # push!(evs, PMUpdate(time = 3*7*24, quantity = :BW, value = 0.5))
 cbssingh = PMSimulatorSimulate.collect_evs(evs, singh);
 
-num_sol = PMSimulatorSimulate.solve(singh, alg=AutoTsit5(Rosenbrock23());callback=cbssingh);
+num_sol = PMSimulatorSimulate.solve(singh, evs, alg=AutoTsit5(Rosenbrock23()));
 # convert model time points in h to day
 tspan_day = num_sol.t/singh.constants.day_to_h; # convert time from h to day
 
@@ -206,4 +207,6 @@ model_TumorDiameter_plot = plot(tspan_day, num_sol.TumorDiameter, xlabel = "time
 xticks!([0, 21, 42, 63], ["0", "21", "42", "63"]);
 display(model_TumorDiameter_plot)
 
-prob_sens = ODEForwardSensitivityProblem(singh);
+prob_sens = PMParameterizedSensitivity.ODEForwardSensitivityProblem(singh, evs);
+
+
