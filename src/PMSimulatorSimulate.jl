@@ -8,7 +8,7 @@ states = PMSimulatorBase.ModelingToolkit.states
 PMModel = PMParameterizedBase.PMModel
 PMSolution = PMParameterizedSolve.PMSolution
 partialSol = PMParameterizedSolve.partialSol
-PMEvent = PMSimulatorBase.PMEvent
+PMEvent = PMParameterizedBase.PMEvent
 collect_evs = PMSimulatorBase.collect_evs
 include("solve.jl")
 
