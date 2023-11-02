@@ -35,8 +35,8 @@ end
 
 
     
-
-function PMParameterizedSolve.solve(mdl::PMModel, evs::Vector{PMEvent}, alg::Union{DEAlgorithm,Nothing} = nothing; kwargs...)
+eventVector = Vector{T1} where T1 <: PMEvent
+function PMParameterizedSolve.solve(mdl::PMModel, evs::eventVector, alg::Union{DEAlgorithm,Nothing} = nothing; kwargs...)
     # Save parameters and inputs prior to solution. This will let us restore them after. # This could (PROBABLY WILL) have implications/cause problems for parallel solution...
     initP = deepcopy(mdl.parameters.values)
     initU = deepcopy(mdl.states.values)
@@ -63,6 +63,7 @@ function PMParameterizedSolve.solve(mdl::PMModel, data::PMSimulatorBase.DataFram
     for instance in dfevs.instances
         evi = vcat(instance.inputs, instance.updates)
         cbs = collect_evs(evi, mdl)
+        # println(mdl._inputs)
         sol_i = PMParameterizedSolve.solve(mdl, alg; callback = cbs, kwargs...)
         # push!(sol_out, sol_i)
         sol_out[instance.ID] = sol_i
@@ -72,9 +73,5 @@ function PMParameterizedSolve.solve(mdl::PMModel, data::PMSimulatorBase.DataFram
         mdl.states.parameters.values[:] = initP
         mdl._inputs.values[:] = initIn
     end
-    if length(sol_out) == 1
-        return Base.values(sol_out)[1]
-    else
-        return sol_out
-    end
+    return sol_out
 end
