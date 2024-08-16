@@ -1,9 +1,9 @@
 module PMSimulatorSimulate
-using PMParameterizedBase
-using PMParameterizedSolve
-import PMParameterizedSolve: solve
-import PMParameterizedSolve: solve!
-using PMSimulatorBase
+using ..PMParameterizedBase
+using ..PMParameterizedSolve
+import .PMParameterizedSolve: solve
+import .PMParameterizedSolve: solve!
+using ..PMSimulatorBase
 using DifferentialEquations
 parameters = PMSimulatorBase.ModelingToolkit.parameters
 states = PMSimulatorBase.ModelingToolkit.states
