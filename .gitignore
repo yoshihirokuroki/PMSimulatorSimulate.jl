@@ -6,3 +6,5 @@
 **/.DS_Store
 **/Manifest.toml
 .vscode/settings.json
+*.key
+*.pptx
