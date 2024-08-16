@@ -1,8 +1,8 @@
 using Revise
-using PMParameterizedBase
-using PMSimulatorBase
-using PMSimulatorSimulate
-using PMParameterizedSensitivity
+using .PMParameterizedBase
+using .PMSimulatorBase
+using .PMSimulatorSimulate
+using .PMParameterizedSensitivity
 using Unitful
 using DifferentialEquations
 using Plots
@@ -50,6 +50,7 @@ singh = @model Singh begin
         varepsilon_Drug = 0.44,[description="tumor void volume for DM1 catabolites"]
         # Parameters associated with systemic pharmacokinetics in Human
         CL_ADC = 0.0043/day_to_h , [unit=u"L*hr^-1*kg^-1", description="central clearance of ADC"]
+#        CL_ADC = 6*0.0043/day_to_h , [unit=u"L*hr^-1*kg^-1", description="central clearance of ADC"]
         CLD_ADC = 0.014/day_to_h, [unit=u"L*hr^-1*kg^-1", description="distributional clearance of ADC"]
         V1_ADC = 0.034, [unit=u"L*kg^-1", description="central volume of distribution of ADC"]
         V2_ADC = 0.04, [unit=u"L*kg^-1", description="peripheral volume of distribution of ADC"]
