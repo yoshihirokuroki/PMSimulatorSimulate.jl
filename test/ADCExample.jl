@@ -210,4 +210,14 @@ display(model_TumorDiameter_plot)
 
 prob_sens = PMParameterizedSensitivity.ODEForwardSensitivityProblem(singh, evs);
 
+sol_result = DataFrame(
+    Time_day = tspan_day, 
+    ADC_plasma = num_sol.C1_ADC_nM, 
+    Drug_plasma = num_sol.C1_Drug_nM, 
+    Drug_free_int_cell = num_sol.C_Drug_f_cell_nM, 
+    Drug_bound_int_cell = num_sol.C_Drug_b_cell_nM, 
+    Drug_free_ex_cell = num_sol.C_Drug_f_ex_nM, 
+    Tumor_diameter = num_sol.TumorDiameter
+    )
 
+CSV.write("PMSimulatorSimulate.jl/test/ADC_solve.csv", sol_result)
