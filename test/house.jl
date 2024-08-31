@@ -1,4 +1,4 @@
-using PMParameterizedBase
+using .PMParameterizedBase
 
 house = @model house begin
     @IVs t [description = "Independent variable time (hrs)", tspan = (0.0, 120.0)]
